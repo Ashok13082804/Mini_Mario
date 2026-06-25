@@ -1,769 +1,689 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mini Mario – 2D Platformer</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: #1a1a2e;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      font-family: 'Segoe UI', sans-serif;
-      overflow: hidden;
-    }
-    #title {
-      color: #ffd700;
-      font-size: 2rem;
-      font-weight: 900;
-      letter-spacing: 4px;
-      text-shadow: 0 0 20px #ff6b35, 3px 3px 0 #c0392b;
-      margin-bottom: 12px;
-      text-transform: uppercase;
-    }
-    #gameWrapper {
-      position: relative;
-      border: 4px solid #ffd700;
-      border-radius: 4px;
-      box-shadow: 0 0 40px #ffd70066, 0 0 80px #ff6b3533;
-    }
-    canvas {
-      display: block;
-      image-rendering: pixelated;
-    }
-    #hud {
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-      padding: 6px 16px;
-      background: #16213e;
-      color: #fff;
-      font-size: 0.9rem;
-      font-weight: bold;
-      letter-spacing: 2px;
-      border-top: 3px solid #ffd700;
-    }
-    #hud span { color: #ffd700; }
-    #controls {
-      margin-top: 10px;
-      color: #aaa;
-      font-size: 0.75rem;
-      letter-spacing: 1px;
-    }
-    #controls b { color: #ffd700; }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super Mini Mario Adventure - Modern Platformer Dashboard</title>
+  <!-- SEO & Meta -->
+  <meta name="description" content="Embark on a premium 2D platformer adventure. Explore 5 unique worlds, unlock skills, customise your character, earn achievements, and view statistics.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="index.css">
 </head>
 <body>
-  <div id="title">⭐ Mini Mario ⭐</div>
-  <div id="gameWrapper">
-    <canvas id="gameCanvas" width="800" height="450"></canvas>
-    <div id="hud">
-      <div>SCORE: <span id="scoreDisplay">0</span></div>
-      <div>COINS: <span id="coinDisplay">0</span></div>
-      <div>LIVES: <span id="livesDisplay">❤️❤️❤️</span></div>
+  <!-- Achievement Unlock Notification Toast -->
+  <div id="achievement-toast" class="toast hidden">
+    <div class="toast-icon">🏆</div>
+    <div class="toast-content">
+      <div class="toast-title">Achievement Unlocked!</div>
+      <div id="toast-name" class="toast-desc">First Jump</div>
     </div>
   </div>
-  <div id="controls">
-    <b>← →</b> Move &nbsp;|&nbsp; <b>↑ / Space</b> Jump &nbsp;|&nbsp; <b>R</b> Restart
+
+  <!-- Main Container -->
+  <div class="app-container">
+    <!-- Sidebar Navigation (Premium SaaS Dashboard Style) -->
+    <nav class="sidebar hidden" id="main-nav">
+      <div class="brand">
+        <span class="brand-icon">🎮</span>
+        <span class="brand-text">Mini Mario</span>
+      </div>
+      
+      <div class="nav-links">
+        <button class="nav-btn active" data-view="world-map">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 3.99L19.53 19H4.47L12 5.99zM11 16h2v2h-2zm0-6h2v4h-2z"/></svg>
+          Adventure Map
+        </button>
+        <button class="nav-btn" data-view="game">
+          <svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 3c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3-3c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+          Play Level
+        </button>
+        <button class="nav-btn" data-view="profile">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
+          Player Stats
+        </button>
+        <button class="nav-btn" data-view="skills">
+          <svg viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 4l6.3 11H5.7L12 6zm-1 5h2v2h-2zm0 3h2v2h-2z"/></svg>
+          Skill Tree
+        </button>
+        <button class="nav-btn" data-view="shop">
+          <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+          Costume Shop
+        </button>
+        <button class="nav-btn" data-view="missions">
+          <svg viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+          Quests & Rewards
+        </button>
+        <button class="nav-btn" data-view="settings">
+          <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+          Settings
+        </button>
+      </div>
+
+      <!-- User Mini Profile Footer -->
+      <div class="user-footer" id="user-footer">
+        <div class="user-avatar" id="nav-avatar">👨‍🔧</div>
+        <div class="user-info">
+          <div class="user-name" id="nav-username">Mario Player</div>
+          <div class="user-level-badge">Lvl <span id="nav-level">1</span></div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Global Bar (Stats overview & sound controls) -->
+      <header class="top-bar hidden" id="top-bar">
+        <div class="view-title" id="active-view-title">Adventure Map</div>
+        
+        <div class="global-stats">
+          <div class="stat-pill coin-pill">
+            <span class="pill-icon">🪙</span>
+            <span class="pill-val" id="global-coins">0</span>
+          </div>
+          <div class="stat-pill gem-pill">
+            <span class="pill-icon">💎</span>
+            <span class="pill-val" id="global-gems">0</span>
+          </div>
+          <div class="stat-pill xp-pill">
+            <span class="pill-icon">⚡</span>
+            <span class="pill-val" id="global-xp">0 XP</span>
+          </div>
+          <button class="mute-btn" id="global-mute-btn" title="Toggle Sound">
+            🔊
+          </button>
+        </div>
+      </header>
+
+      <!-- View Containers -->
+
+      <!-- 1. LANDING VIEW -->
+      <section class="view active" id="landing-view">
+        <div class="landing-hero">
+          <div class="hero-logo">🎮</div>
+          <h1>Super Mini Mario</h1>
+          <p class="subtitle">A Premium Modern Platformer Adventure</p>
+          
+          <div class="landing-actions">
+            <button class="btn btn-primary btn-lg" id="btn-start-adventure">
+              Start Adventure
+            </button>
+            <button class="btn btn-secondary btn-lg" id="btn-view-profile">
+              Player Profile
+            </button>
+          </div>
+        </div>
+
+        <div class="landing-features">
+          <div class="feature-card">
+            <div class="feature-icon">🗺️</div>
+            <h3>5 Themed Worlds</h3>
+            <p>From Whispering Forests to slippery Glaciers and Boss Keeps.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Skill Tree Systems</h3>
+            <p>Unlock Double Jump, Wall Jumps, Air Dashing, and Shields.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">👕</div>
+            <h3>Costume Shop</h3>
+            <p>Spend coins to equip Fire Red, Ice Blue, and Cosmic skins.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🏆</div>
+            <h3>Missions & Badges</h3>
+            <p>Complete daily quests to claim gems and unlock gold achievements.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. WORLD MAP VIEW -->
+      <section class="view" id="world-map-view">
+        <div class="world-navigation-container">
+          <div class="world-header-details">
+            <h2 id="current-world-name">World 1: Whispering Forest</h2>
+            <p id="current-world-description">Lush green platforms, basic enemies, and simple jumping challenges.</p>
+          </div>
+          
+          <!-- Interactive Map Node Diagram -->
+          <div class="world-map-grid">
+            <div class="world-map-node active" data-world="1">
+              <div class="node-bg">🌲</div>
+              <div class="node-title">Forest World</div>
+              <div class="node-progress">3/3 Cleared</div>
+            </div>
+            
+            <div class="world-map-connector-line"></div>
+            
+            <div class="world-map-node locked" data-world="2">
+              <div class="node-bg">🏜️</div>
+              <div class="node-title">Desert World</div>
+              <div class="node-progress">Locked</div>
+            </div>
+            
+            <div class="world-map-connector-line"></div>
+            
+            <div class="world-map-node locked" data-world="3">
+              <div class="node-bg">❄️</div>
+              <div class="node-title">Ice World</div>
+              <div class="node-progress">Locked</div>
+            </div>
+            
+            <div class="world-map-connector-line"></div>
+            
+            <div class="world-map-node locked" data-world="4">
+              <div class="node-bg">☁️</div>
+              <div class="node-title">Sky World</div>
+              <div class="node-progress">Locked</div>
+            </div>
+            
+            <div class="world-map-connector-line"></div>
+            
+            <div class="world-map-node locked" data-world="5">
+              <div class="node-bg">🏰</div>
+              <div class="node-title">Castle World</div>
+              <div class="node-progress">Locked</div>
+            </div>
+          </div>
+
+          <!-- Levels Container for Active World -->
+          <div class="levels-section">
+            <h3>Select Level</h3>
+            <div class="levels-grid" id="levels-grid">
+              <!-- Dynamically Populated by app.js -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. GAME PLAY VIEW -->
+      <section class="view" id="game-view">
+        <div class="game-layout">
+          <!-- Left side: Game Info & Control Modes -->
+          <div class="game-sidebar">
+            <div class="glass-panel game-mode-card">
+              <h3>Play Mode</h3>
+              <div class="mode-selectors">
+                <button class="mode-btn active" data-mode="standard">
+                  <h4>Standard Adventure</h4>
+                  <p>Explore, find checkpoints, reach the flag.</p>
+                </button>
+                <button class="mode-btn" data-mode="timeattack">
+                  <h4>Time Challenge</h4>
+                  <p>Strict countdown timer. Move fast!</p>
+                </button>
+                <button class="mode-btn" data-mode="endless">
+                  <h4>Endless Runner</h4>
+                  <p>Dynamic scroll. Survive as speed scales!</p>
+                </button>
+                <button class="mode-btn" data-mode="survival">
+                  <h4>One-Life Survival</h4>
+                  <p>No extra lives, no checkpoints. Ultimate test.</p>
+                </button>
+              </div>
+            </div>
+            
+            <div class="glass-panel controls-guide-card">
+              <h3>Controls</h3>
+              <div class="controls-list">
+                <div class="control-row"><span>Walk / Run</span><span>⬅️ ➡️ / A D</span></div>
+                <div class="control-row"><span>Jump / Double Jump</span><span>Space / W / ⬆️</span></div>
+                <div class="control-row"><span>Dash</span><span>Shift / J</span></div>
+                <div class="control-row"><span>Slide / Crouch</span><span>⬇️ / S</span></div>
+                <div class="control-row"><span>Pause Game</span><span>P / Esc</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Game Canvas Container -->
+          <div class="canvas-container">
+            <div class="hud-bar">
+              <div class="hud-item">❤️ x<span id="hud-lives">3</span></div>
+              <div class="hud-item">🪙 <span id="hud-coins">000</span></div>
+              <div class="hud-item">💎 <span id="hud-gems">00</span></div>
+              <div class="hud-item">⏳ <span id="hud-timer">000</span>s</div>
+              <div class="hud-item score-item">Score: <span id="hud-score">00000</span></div>
+              <button class="hud-pause-btn" id="btn-pause">⏸️</button>
+            </div>
+            
+            <!-- Target Canvas -->
+            <div class="canvas-wrapper">
+              <canvas id="game-canvas" width="800" height="480"></canvas>
+              
+              <!-- Floating Active Power-ups Bar -->
+              <div class="powerup-timers" id="powerup-timers">
+                <!-- Dynamically populated e.g. Shield, Magnet -->
+              </div>
+              
+              <!-- Canvas Screens/Overlays -->
+              
+              <!-- Start / Tap to Start Overlay -->
+              <div class="canvas-overlay" id="overlay-start">
+                <div class="overlay-card">
+                  <h2 id="overlay-level-title">World 1-1</h2>
+                  <p id="overlay-level-desc">Get ready to jump, dash, and collect coins!</p>
+                  <button class="btn btn-primary" id="btn-play-now">Start Run</button>
+                </div>
+              </div>
+
+              <!-- Pause Overlay -->
+              <div class="canvas-overlay hidden" id="overlay-pause">
+                <div class="overlay-card">
+                  <h2>Game Paused</h2>
+                  <div class="overlay-buttons">
+                    <button class="btn btn-primary" id="btn-resume">Resume</button>
+                    <button class="btn btn-secondary" id="btn-restart">Restart Run</button>
+                    <button class="btn btn-danger" id="btn-quit">World Map</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Game Over Overlay -->
+              <div class="canvas-overlay hidden" id="overlay-gameover">
+                <div class="overlay-card">
+                  <h2 class="text-error">GAME OVER</h2>
+                  <p>Better luck next time!</p>
+                  <div class="overlay-buttons">
+                    <button class="btn btn-primary" id="btn-go-retry">Try Again</button>
+                    <button class="btn btn-secondary" id="btn-go-quit">World Map</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Level Completed / Victory Screen -->
+              <div class="canvas-overlay hidden" id="overlay-victory">
+                <div class="overlay-card">
+                  <h2 class="text-success">STAGE CLEAR! 🌟</h2>
+                  <p id="victory-level-name">World 1-1 Completed</p>
+                  
+                  <div class="victory-stats">
+                    <div class="v-stat"><span>Time Taken:</span><span id="victory-time">0</span>s</div>
+                    <div class="v-stat"><span>Coins Gathered:</span><span id="victory-coins">0</span></div>
+                    <div class="v-stat"><span>Gems Discovered:</span><span id="victory-gems">0</span>/3</div>
+                    <div class="v-stat"><span>XP Awarded:</span><span id="victory-xp">+0 XP</span></div>
+                  </div>
+
+                  <div class="stars-container" id="victory-stars">
+                    <span>⭐</span><span>⭐</span><span>⭐</span>
+                  </div>
+
+                  <div class="overlay-buttons">
+                    <button class="btn btn-primary" id="btn-victory-continue">Continue</button>
+                    <button class="btn btn-secondary" id="btn-victory-replay">Replay Level</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mobile Controls D-Pad and Buttons -->
+            <div class="mobile-controls-wrapper" id="mobile-controls">
+              <div class="dpad">
+                <button class="mobile-btn-key" id="m-btn-left">◀️</button>
+                <div class="dpad-vertical">
+                  <button class="mobile-btn-key" id="m-btn-up">▲</button>
+                  <button class="mobile-btn-key" id="m-btn-down">▼</button>
+                </div>
+                <button class="mobile-btn-key" id="m-btn-right">▶️</button>
+              </div>
+              <div class="action-buttons">
+                <button class="mobile-action-btn dash" id="m-btn-dash">DASH</button>
+                <button class="mobile-action-btn jump" id="m-btn-jump">JUMP</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. PLAYER PROFILE VIEW -->
+      <section class="view" id="profile-view">
+        <div class="profile-layout">
+          <!-- Profile Card -->
+          <div class="profile-card glass-panel">
+            <div class="profile-avatar-large" id="profile-avatar">👨‍🔧</div>
+            <h2 id="profile-username">Super Player</h2>
+            <div class="profile-level-badge">LEVEL <span id="profile-lvl-num">1</span></div>
+            
+            <div class="xp-progress-container">
+              <div class="xp-labels">
+                <span>XP: <span id="profile-xp-curr">0</span> / <span id="profile-xp-next">100</span></span>
+                <span id="profile-xp-pct">0%</span>
+              </div>
+              <div class="xp-progress-bar-bg">
+                <div class="xp-progress-bar-fill" id="profile-xp-fill" style="width: 0%"></div>
+              </div>
+            </div>
+            
+            <div class="completion-meter">
+              <div class="meter-title">Adventure Completion: <span id="profile-complete-pct">0%</span></div>
+              <div class="meter-bg"><div class="meter-fill" id="profile-complete-fill" style="width: 0%"></div></div>
+            </div>
+          </div>
+
+          <!-- Gameplay Statistics -->
+          <div class="stats-card glass-panel">
+            <h3>Gameplay Statistics</h3>
+            <div class="stats-grid">
+              <div class="stat-box">
+                <div class="stat-val" id="stat-completed-levels">0/15</div>
+                <div class="stat-lbl">Levels Completed</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" id="stat-coins-collected">0</div>
+                <div class="stat-lbl">Total Coins</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" id="stat-gems-found">0</div>
+                <div class="stat-lbl">Gems Discovered</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" id="stat-enemies-defeated">0</div>
+                <div class="stat-lbl">Enemies Defeated</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" id="stat-death-count">0</div>
+                <div class="stat-lbl">Death Count</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" id="stat-bosses-slain">0</div>
+                <div class="stat-lbl">Bosses Defeated</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- High Scores & Local Leaderboard -->
+          <div class="leaderboard-card glass-panel">
+            <h3>Local Highscores</h3>
+            <div class="leaderboard-tabs">
+              <button class="leader-tab active" data-board="speedrun">Speedrun times</button>
+              <button class="leader-tab" data-board="coins">Coin collector</button>
+            </div>
+            <div class="leaderboard-table-wrapper">
+              <table class="leaderboard-table">
+                <thead>
+                  <tr>
+                    <th>Level</th>
+                    <th>Score / Record Time</th>
+                    <th>Rank</th>
+                  </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                  <!-- Dynamically loaded -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Achievements Cabinet -->
+          <div class="achievements-card glass-panel">
+            <h3>Trophy Room & Badges</h3>
+            <div class="achievements-grid" id="achievements-grid">
+              <!-- Dynamically populated with badges -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. SKILL TREE VIEW -->
+      <section class="view" id="skills-view">
+        <div class="skills-layout">
+          <div class="skills-intro">
+            <h2>Character Upgrade Tree</h2>
+            <p>Spend your Gems (💎) collected in secret rooms to unlock permanent hero abilities and modifiers.</p>
+          </div>
+
+          <!-- Skill Tree Grid View -->
+          <div class="skills-tree-wrapper">
+            <!-- Row 1: Core / Tier 1 -->
+            <div class="skill-node branch-core" id="skill-doubleJump" data-skill="doubleJump" data-cost="2">
+              <div class="skill-icon">🚀</div>
+              <h4>Double Jump</h4>
+              <p>Triggers a secondary jump in mid-air.</p>
+              <div class="skill-cost">💎 2</div>
+              <div class="skill-status">Locked</div>
+            </div>
+
+            <!-- Connecting indicators -->
+            <div class="skill-connectors">
+              <div class="arrow-down"></div>
+            </div>
+
+            <!-- Row 2: Movement Tier 2 -->
+            <div class="skills-row">
+              <div class="skill-node branch-left" id="skill-wallJump" data-skill="wallJump" data-cost="4">
+                <div class="skill-icon">🧗</div>
+                <h4>Wall Jump</h4>
+                <p>Cling to vertical walls and jump off them.</p>
+                <div class="skill-cost">💎 4</div>
+                <div class="skill-status">Locked</div>
+              </div>
+
+              <div class="skill-node branch-middle" id="skill-dash" data-skill="dash" data-cost="5">
+                <div class="skill-icon">💨</div>
+                <h4>Dash movement</h4>
+                <p>A quick horizontal burst forward (Press Shift/J).</p>
+                <div class="skill-cost">💎 5</div>
+                <div class="skill-status">Locked</div>
+              </div>
+
+              <div class="skill-node branch-right" id="skill-slide" data-skill="slide" data-cost="3">
+                <div class="skill-icon">🛷</div>
+                <h4>Slide Action</h4>
+                <p>Slide under low ceiling blocks (Press Down/S).</p>
+                <div class="skill-cost">💎 3</div>
+                <div class="skill-status">Locked</div>
+              </div>
+            </div>
+
+            <!-- Row 3: Support Tier 3 -->
+            <div class="skills-row">
+              <div class="skill-node branch-left" id="skill-shield" data-skill="shield" data-cost="6">
+                <div class="skill-icon">🛡️</div>
+                <h4>Shield Power-up</h4>
+                <p>Start each level with a shield absorbing 1 hit.</p>
+                <div class="skill-cost">💎 6</div>
+                <div class="skill-status">Locked</div>
+              </div>
+
+              <div class="skill-node branch-right" id="skill-magnet" data-skill="magnet" data-cost="8">
+                <div class="skill-icon">🧲</div>
+                <h4>Coin Magnet</h4>
+                <p>Attracts all coins within 4 blocks of Mario.</p>
+                <div class="skill-cost">💎 8</div>
+                <div class="skill-status">Locked</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. SHOP & CUSTOMIZATION VIEW -->
+      <section class="view" id="shop-view">
+        <div class="shop-layout">
+          <!-- Skins Showcase and Customization panel -->
+          <div class="wardrobe-panel glass-panel">
+            <h3>Character Wardrobe</h3>
+            <p>Select skin to equip for your next adventure.</p>
+            
+            <div class="equipped-character-preview">
+              <div class="character-preview-display" id="char-preview-box">
+                <!-- Will render player visual preview -->
+                <div class="preview-sprite" id="preview-sprite-graphic">🧔</div>
+              </div>
+              <h4 id="preview-skin-name">Classic Overalls</h4>
+              <p id="preview-skin-desc">The default red-cap blue overalls style.</p>
+              <button class="btn btn-primary" id="btn-equip-skin" disabled>Equipped</button>
+            </div>
+          </div>
+
+          <!-- Shop Grid -->
+          <div class="shop-inventory-panel glass-panel">
+            <h3>Outfit Shop</h3>
+            <p>Spend collected Coins (🪙) to unlock legendary skins.</p>
+            
+            <div class="shop-grid">
+              <div class="shop-card" data-skin="classic">
+                <div class="shop-skin-icon">🔴</div>
+                <h4>Classic Mario</h4>
+                <p>Standard outfit</p>
+                <button class="btn btn-secondary shop-action-btn" data-skin-btn="classic">Equipped</button>
+              </div>
+
+              <div class="shop-card" data-skin="fire">
+                <div class="shop-skin-icon">🔥</div>
+                <h4>Fire Red Cap</h4>
+                <p>Fiery red cap and white shirt style.</p>
+                <div class="shop-cost">🪙 200</div>
+                <button class="btn btn-primary shop-action-btn" data-skin-btn="fire">Buy Skin</button>
+              </div>
+
+              <div class="shop-card" data-skin="ice">
+                <div class="shop-skin-icon">❄️</div>
+                <h4>Ice Blue Cap</h4>
+                <p>Deep frost design with icy details.</p>
+                <div class="shop-cost">🪙 400</div>
+                <button class="btn btn-primary shop-action-btn" data-skin-btn="ice">Buy Skin</button>
+              </div>
+
+              <div class="shop-card" data-skin="gold">
+                <div class="shop-skin-icon">👑</div>
+                <h4>Gold Emperor</h4>
+                <p>Shiny golden texture for royals.</p>
+                <div class="shop-cost">🪙 800</div>
+                <button class="btn btn-primary shop-action-btn" data-skin-btn="gold">Buy Skin</button>
+              </div>
+
+              <div class="shop-card" data-skin="cosmic">
+                <div class="shop-skin-icon">🌌</div>
+                <h4>Cosmic Star</h4>
+                <p>Space visual overlay, glows in dark areas.</p>
+                <div class="shop-cost">🪙 1500</div>
+                <button class="btn btn-primary shop-action-btn" data-skin-btn="cosmic">Buy Skin</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. MISSIONS & DAILY REWARDS VIEW -->
+      <section class="view" id="missions-view">
+        <div class="missions-layout">
+          <!-- Daily Reward Box -->
+          <div class="daily-reward-card glass-panel">
+            <div class="chest-box">
+              <div class="chest-emoji" id="chest-graphic">🎁</div>
+              <h3>Daily Mystery Chest</h3>
+              <p>Claim daily rewards of Coins and Gems! Refreshes every 24 hours.</p>
+              <div class="daily-timer" id="daily-claim-timer">Ready to Claim!</div>
+              <button class="btn btn-primary btn-lg" id="btn-claim-daily">Open Chest</button>
+            </div>
+          </div>
+
+          <!-- Active Quests checklist -->
+          <div class="quests-card glass-panel">
+            <h3>Adventure Quests</h3>
+            <p>Complete these target missions to receive XP boosts and Gems.</p>
+            
+            <div class="quests-list" id="quests-list-container">
+              <!-- Dynamically populated quest list with progress bars -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. SETTINGS VIEW -->
+      <section class="view" id="settings-view">
+        <div class="settings-layout">
+          <!-- Volume Configurations -->
+          <div class="settings-card glass-panel">
+            <h3>Audio Settings</h3>
+            
+            <div class="settings-row-input">
+              <label for="slider-sound-volume">Sound Effects (SFX) Volume</label>
+              <div class="volume-slider-group">
+                <span class="volume-icon">🔈</span>
+                <input type="range" id="slider-sound-volume" min="0" max="1" step="0.1" value="0.5">
+                <span class="volume-val" id="sound-vol-txt">50%</span>
+              </div>
+            </div>
+
+            <div class="settings-row-input">
+              <label for="slider-music-volume">Chiptune Background Music</label>
+              <div class="volume-slider-group">
+                <span class="volume-icon">🎵</span>
+                <input type="range" id="slider-music-volume" min="0" max="1" step="0.1" value="0.3">
+                <span class="volume-val" id="music-vol-txt">30%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Save Slot Manager -->
+          <div class="settings-card glass-panel">
+            <h3>Local Storage Game Save Manager</h3>
+            <p>Manage your progression slots. We support offline profiles saved in your browser.</p>
+            
+            <div class="save-slots-grid">
+              <div class="save-slot-card active" data-slot="1">
+                <h4>Save Slot 1</h4>
+                <p class="slot-info" id="slot-1-info">Coins: 0 | Levels: 1</p>
+                <div class="slot-actions">
+                  <button class="btn btn-secondary btn-sm" data-action="load-slot" data-slot="1">Load</button>
+                  <button class="btn btn-danger btn-sm" data-action="reset-slot" data-slot="1">Clear</button>
+                </div>
+              </div>
+
+              <div class="save-slot-card" data-slot="2">
+                <h4>Save Slot 2</h4>
+                <p class="slot-info" id="slot-2-info">Empty</p>
+                <div class="slot-actions">
+                  <button class="btn btn-secondary btn-sm" data-action="load-slot" data-slot="2">Load</button>
+                  <button class="btn btn-danger btn-sm" data-action="reset-slot" data-slot="2">Clear</button>
+                </div>
+              </div>
+
+              <div class="save-slot-card" data-slot="3">
+                <h4>Save Slot 3</h4>
+                <p class="slot-info" id="slot-3-info">Empty</p>
+                <div class="slot-actions">
+                  <button class="btn btn-secondary btn-sm" data-action="load-slot" data-slot="3">Load</button>
+                  <button class="btn btn-danger btn-sm" data-action="reset-slot" data-slot="3">Clear</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Accessibility -->
+          <div class="settings-card glass-panel">
+            <h3>Accessibility Options</h3>
+            <div class="accessibility-toggles">
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggle-high-contrast">
+                <span class="toggle-slider"></span>
+                <span class="toggle-label">High Contrast HUD (Darker text/borders)</span>
+              </label>
+              
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggle-screen-effects" checked>
+                <span class="toggle-slider"></span>
+                <span class="toggle-label">Screen Shake and Flashing effects</span>
+              </label>
+              
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggle-pause-on-blur" checked>
+                <span class="toggle-slider"></span>
+                <span class="toggle-label">Auto-pause game when window loses focus</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
 
-<script>
-// ─────────────────────────────────────────────
-//  CANVAS SETUP
-// ─────────────────────────────────────────────
-const canvas = document.getElementById('gameCanvas');
-const ctx    = canvas.getContext('2d');
-const W = canvas.width;
-const H = canvas.height;
-
-// ─────────────────────────────────────────────
-//  COLOUR PALETTE  (pixel-art style)
-// ─────────────────────────────────────────────
-const C = {
-  sky1: '#5c94fc',  sky2: '#3d6be0',
-  cloud: '#fff',    cloudShadow: '#dce8ff',
-  ground: '#e7a020',groundDark: '#c07010',groundDirt: '#8b6914',
-  brick: '#c84c0c', brickLine: '#a83808',
-  pipe1: '#54a800', pipe2: '#3b8000', pipeDark: '#2a6000', pipeRim: '#70d000',
-  qTop: '#f87820',  qSide: '#c85000', qShadow: '#8b3000', qQ: '#fff',
-  mario: '#ff0000', marioBrown: '#8b5000', marioBlue: '#0000ff',
-  marioPeach: '#f8c068', marioEyes: '#000',
-  coin: '#ffd700',  coinShine: '#fff8aa',
-  star: '#ffd700',
-};
-
-// ─────────────────────────────────────────────
-//  TILE DEFINITIONS  32×32 px each
-// ─────────────────────────────────────────────
-const TILE = 32;
-
-// Tile IDs
-const T = { EMPTY:0, GROUND:1, BRICK:2, QUESTION:3, PIPE_TOP_L:4, PIPE_TOP_R:5,
-            PIPE_BODY_L:6, PIPE_BODY_R:7, COIN:8, SOLID_BLOCK:9 };
-
-// ─────────────────────────────────────────────
-//  LEVEL MAP  (25 cols × ~14 rows, Y from top)
-// ─────────────────────────────────────────────
-const MAP_COLS = 25;
-const MAP_ROWS = 14;
-const GROUND_ROW = 11; // row index of top of ground
-
-// prettier-ignore
-const levelMap = [
-  // row 0 (sky top)
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  // row 1
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  // row 2
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  // row 3
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  // row 4 – brick platforms
-  [0,0,0,0,0,2,2,0,0,0,0,0,0,0,3,0,2,2,2,0,0,0,0,0,0],
-  // row 5
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  // row 6 – mid platform
-  [0,0,0,0,0,0,0,0,0,0,9,9,9,9,0,0,0,0,0,0,0,0,0,0,0],
-  // row 7
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  // row 8
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  // row 9 – pipe
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,5,0,0,0,0],
-  // row 10 – pipe body
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,7,0,0,0,0],
-  // row 11 – GROUND TOP
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-  // row 12
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-  // row 13
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-];
-
-// ─────────────────────────────────────────────
-//  GAME STATE
-// ─────────────────────────────────────────────
-let score = 0, coins = 0, lives = 3;
-let particles = [];
-let floatingTexts = [];
-let questionBumped = {}; // col,row → true means already hit
-let cameraX = 0;
-
-const GRAVITY    = 0.55;
-const JUMP_FORCE = -13;
-const MOVE_SPEED = 4;
-
-let mario = {
-  x: 80, y: 0,
-  w: 28, h: 36,
-  vx: 0, vy: 0,
-  onGround: false,
-  facing: 1, // 1=right, -1=left
-  frame: 0,  // walk frame 0-2
-  frameTimer: 0,
-  jumping: false,
-  dead: false,
-  invincible: 0,
-  bumpY: 0,   // for question block bump animation
-};
-
-// placed coin pickups in the world
-const coinPickups = [
-  {x:5*TILE+8, y:3*TILE,  w:16,h:16, collected:false},
-  {x:6*TILE+8, y:3*TILE,  w:16,h:16, collected:false},
-  {x:16*TILE+8,y:3*TILE,  w:16,h:16, collected:false},
-  {x:17*TILE+8,y:3*TILE,  w:16,h:16, collected:false},
-  {x:10*TILE+8,y:5*TILE,  w:16,h:16, collected:false},
-  {x:11*TILE+8,y:5*TILE,  w:16,h:16, collected:false},
-  {x:12*TILE+8,y:5*TILE,  w:16,h:16, collected:false},
-];
-
-const keys = {};
-
-// ─────────────────────────────────────────────
-//  INPUT
-// ─────────────────────────────────────────────
-window.addEventListener('keydown', e => {
-  keys[e.code] = true;
-  if ((e.code === 'ArrowUp' || e.code === 'Space') && mario.onGround && !mario.dead) {
-    mario.vy = JUMP_FORCE;
-    mario.onGround = false;
-    mario.jumping = true;
-  }
-  if (e.code === 'KeyR') resetGame();
-  e.preventDefault();
-});
-window.addEventListener('keyup', e => { keys[e.code] = false; });
-
-// ─────────────────────────────────────────────
-//  HELPERS
-// ─────────────────────────────────────────────
-function isSolid(tid) {
-  return tid === T.GROUND || tid === T.BRICK || tid === T.QUESTION ||
-         tid === T.PIPE_TOP_L || tid === T.PIPE_TOP_R ||
-         tid === T.PIPE_BODY_L || tid === T.PIPE_BODY_R || tid === T.SOLID_BLOCK;
-}
-
-function getTile(col, row) {
-  if (row < 0 || row >= MAP_ROWS || col < 0 || col >= MAP_COLS) return T.EMPTY;
-  return levelMap[row][col];
-}
-
-function worldToTile(wx, wy) {
-  return { col: Math.floor(wx / TILE), row: Math.floor(wy / TILE) };
-}
-
-// ─────────────────────────────────────────────
-//  COLLISION  (AABB tile sweep)
-// ─────────────────────────────────────────────
-function resolveCollisions(entity) {
-  // Horizontal
-  entity.x += entity.vx;
-  const cols  = [Math.floor(entity.x / TILE), Math.floor((entity.x + entity.w - 1) / TILE)];
-  const rows  = [Math.floor(entity.y / TILE), Math.floor((entity.y + entity.h - 1) / TILE)];
-  for (const r of rows) {
-    for (const c of cols) {
-      if (isSolid(getTile(c, r))) {
-        if (entity.vx > 0) entity.x = c * TILE - entity.w;
-        if (entity.vx < 0) entity.x = (c + 1) * TILE;
-        entity.vx = 0;
-      }
-    }
-  }
-
-  // Vertical
-  entity.y += entity.vy;
-  const cols2 = [Math.floor(entity.x / TILE), Math.floor((entity.x + entity.w - 1) / TILE)];
-  const rows2 = [Math.floor(entity.y / TILE), Math.floor((entity.y + entity.h - 1) / TILE)];
-  entity.onGround = false;
-  for (const r of rows2) {
-    for (const c of cols2) {
-      const tid = getTile(c, r);
-      if (isSolid(tid)) {
-        if (entity.vy > 0) {
-          // landing
-          entity.y = r * TILE - entity.h;
-          entity.vy = 0;
-          entity.onGround = true;
-          entity.jumping  = false;
-        } else if (entity.vy < 0) {
-          // hitting ceiling
-          entity.y = (r + 1) * TILE;
-          entity.vy = 0;
-          // bump question block?
-          if (tid === T.QUESTION && !questionBumped[`${c},${r}`]) {
-            bumpQuestion(c, r);
-          } else if (tid === T.BRICK) {
-            spawnBrickParticles(c, r);
-            levelMap[r][c] = T.EMPTY;
-            score += 50;
-          }
-        }
-      }
-    }
-  }
-
-  // World bounds
-  if (entity.x < 0) entity.x = 0;
-  if (entity.x + entity.w > MAP_COLS * TILE) entity.x = MAP_COLS * TILE - entity.w;
-}
-
-// ─────────────────────────────────────────────
-//  QUESTION BLOCK BUMP
-// ─────────────────────────────────────────────
-function bumpQuestion(c, r) {
-  questionBumped[`${c},${r}`] = true;
-  levelMap[r][c] = T.SOLID_BLOCK; // turn dull
-  score += 100;
-  coins++;
-  // spawn coin pop
-  spawnCoinPop(c * TILE + TILE / 2, r * TILE);
-  floatingTexts.push({
-    x: c * TILE + TILE / 2,
-    y: r * TILE - 10,
-    text: '+100', color: '#ffd700', life: 60, vy: -1.2
-  });
-}
-
-// ─────────────────────────────────────────────
-//  PARTICLES
-// ─────────────────────────────────────────────
-function spawnBrickParticles(c, r) {
-  const px = c * TILE + TILE / 2;
-  const py = r * TILE + TILE / 2;
-  for (let i = 0; i < 8; i++) {
-    const angle = (i / 8) * Math.PI * 2;
-    particles.push({
-      x: px, y: py,
-      vx: Math.cos(angle) * (2 + Math.random() * 3),
-      vy: Math.sin(angle) * (2 + Math.random() * 3) - 2,
-      w: 8, h: 8,
-      color: Math.random() > 0.5 ? C.brick : C.brickLine,
-      life: 40 + Math.random() * 20, maxLife: 60,
-    });
-  }
-}
-
-function spawnCoinPop(x, y) {
-  for (let i = 0; i < 6; i++) {
-    particles.push({
-      x, y,
-      vx: (Math.random() - 0.5) * 4,
-      vy: -6 - Math.random() * 4,
-      w: 10, h: 10,
-      color: Math.random() > 0.5 ? C.coin : C.coinShine,
-      life: 40, maxLife: 40, type: 'coin',
-    });
-  }
-}
-
-// ─────────────────────────────────────────────
-//  COIN PICKUP
-// ─────────────────────────────────────────────
-function checkCoinPickups() {
-  for (const coin of coinPickups) {
-    if (coin.collected) continue;
-    if (mario.x < coin.x + coin.w &&
-        mario.x + mario.w > coin.x &&
-        mario.y < coin.y + coin.h &&
-        mario.y + mario.h > coin.y) {
-      coin.collected = true;
-      coins++;
-      score += 200;
-      spawnCoinPop(coin.x + 8, coin.y);
-      floatingTexts.push({
-        x: coin.x + 8, y: coin.y - 10,
-        text: '+200', color: '#ffd700', life: 60, vy: -1.2
-      });
-    }
-  }
-}
-
-// ─────────────────────────────────────────────
-//  CAMERA
-// ─────────────────────────────────────────────
-function updateCamera() {
-  const target = mario.x - W / 2 + mario.w / 2;
-  cameraX += (target - cameraX) * 0.12;
-  cameraX = Math.max(0, Math.min(cameraX, MAP_COLS * TILE - W));
-}
-
-// ─────────────────────────────────────────────
-//  UPDATE
-// ─────────────────────────────────────────────
-function update() {
-  if (mario.dead) return;
-
-  // Horizontal movement
-  mario.vx = 0;
-  if (keys['ArrowLeft']  || keys['KeyA']) { mario.vx = -MOVE_SPEED; mario.facing = -1; }
-  if (keys['ArrowRight'] || keys['KeyD']) { mario.vx =  MOVE_SPEED; mario.facing =  1; }
-
-  // Walk animation
-  if (Math.abs(mario.vx) > 0 && mario.onGround) {
-    mario.frameTimer++;
-    if (mario.frameTimer > 8) { mario.frameTimer = 0; mario.frame = (mario.frame + 1) % 3; }
-  } else if (mario.onGround) {
-    mario.frame = 0;
-  }
-
-  // Gravity
-  mario.vy += GRAVITY;
-  if (mario.vy > 16) mario.vy = 16;
-
-  // Collision
-  resolveCollisions(mario);
-
-  // Fell off world
-  if (mario.y > MAP_ROWS * TILE + 60) {
-    deaths();
-  }
-
-  // Coin pickups
-  checkCoinPickups();
-
-  // Invincibility frames
-  if (mario.invincible > 0) mario.invincible--;
-
-  // Particles
-  particles = particles.filter(p => p.life > 0);
-  particles.forEach(p => {
-    p.x += p.vx; p.y += p.vy;
-    p.vy += 0.3;
-    p.life--;
-  });
-
-  // Floating texts
-  floatingTexts = floatingTexts.filter(f => f.life > 0);
-  floatingTexts.forEach(f => { f.y += f.vy; f.life--; });
-
-  updateCamera();
-  updateHUD();
-}
-
-function deaths() {
-  lives--;
-  if (lives <= 0) { lives = 0; updateHUD(); gameOver(); return; }
-  resetMario();
-}
-
-function gameOver() {
-  mario.dead = true;
-}
-
-function resetMario() {
-  mario.x = 80; mario.y = GROUND_ROW * TILE - mario.h - 1;
-  mario.vx = 0; mario.vy = 0;
-  mario.onGround = false; mario.jumping = false;
-  mario.invincible = 120;
-  cameraX = 0;
-}
-
-function resetGame() {
-  score = 0; coins = 0; lives = 3;
-  particles = []; floatingTexts = [];
-  questionBumped = {};
-  coinPickups.forEach(c => c.collected = false);
-  // Restore level
-  levelMap[4][14] = T.QUESTION;
-  levelMap[4][5]  = T.BRICK;
-  levelMap[4][6]  = T.BRICK;
-  levelMap[4][16] = T.BRICK;
-  levelMap[4][17] = T.BRICK;
-  levelMap[4][18] = T.BRICK;
-  mario.dead = false;
-  resetMario();
-  updateHUD();
-}
-
-function updateHUD() {
-  document.getElementById('scoreDisplay').textContent = score;
-  document.getElementById('coinDisplay').textContent  = coins;
-  document.getElementById('livesDisplay').textContent = '❤️'.repeat(Math.max(0, lives));
-}
-
-// ─────────────────────────────────────────────
-//  SPRITE DRAWING (pixel art via ctx primitives)
-// ─────────────────────────────────────────────
-
-function drawGround(x, y) {
-  // Top grass strip
-  ctx.fillStyle = C.ground;
-  ctx.fillRect(x, y, TILE, TILE);
-  // Darker border lines
-  ctx.fillStyle = C.groundDark;
-  ctx.fillRect(x, y, TILE, 4);
-  ctx.fillStyle = C.groundDirt;
-  ctx.fillRect(x, y + 4, TILE, TILE - 4);
-  // Texture dots
-  ctx.fillStyle = '#6b4e12';
-  ctx.fillRect(x + 6,  y + 10, 3, 3);
-  ctx.fillRect(x + 18, y + 18, 3, 3);
-  ctx.fillRect(x + 10, y + 24, 3, 3);
-}
-
-function drawBrick(x, y) {
-  ctx.fillStyle = C.brick;
-  ctx.fillRect(x, y, TILE, TILE);
-  ctx.fillStyle = C.brickLine;
-  // Mortar lines
-  ctx.fillRect(x, y + 10, TILE, 2);
-  ctx.fillRect(x, y + 22, TILE, 2);
-  ctx.fillRect(x, y, 2, 10);
-  ctx.fillRect(x + 16, y, 2, 10);
-  ctx.fillRect(x + 8,  y + 12, 2, 10);
-  ctx.fillRect(x + 24, y + 12, 2, 10);
-  ctx.fillRect(x,      y + 24, 2, 8);
-  ctx.fillRect(x + 16, y + 24, 2, 8);
-  // shine
-  ctx.fillStyle = '#e87030';
-  ctx.fillRect(x + 1, y + 1, TILE - 2, 2);
-}
-
-function drawQuestion(x, y, bumped) {
-  const yOff = bumped ? 0 : 0;
-  ctx.fillStyle = bumped ? '#888' : C.qTop;
-  ctx.fillRect(x, y + yOff, TILE, TILE);
-  if (!bumped) {
-    ctx.fillStyle = C.qSide;
-    ctx.fillRect(x, y + yOff, 3, TILE);
-    ctx.fillRect(x + TILE - 3, y + yOff, 3, TILE);
-    ctx.fillRect(x, y + yOff + TILE - 3, TILE, 3);
-    ctx.fillStyle = C.qShadow;
-    ctx.fillRect(x + 3, y + yOff + 3, TILE - 6, 2);
-    // Animated '?'
-    ctx.fillStyle = C.qQ;
-    ctx.font = 'bold 20px monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText('?', x + TILE / 2, y + yOff + TILE - 7);
-  } else {
-    ctx.fillStyle = '#666';
-    ctx.fillRect(x + 2, y + 2, TILE - 4, TILE - 4);
-  }
-}
-
-function drawPipeTopL(x, y) {
-  ctx.fillStyle = C.pipe1;
-  ctx.fillRect(x - 3, y, TILE + 3, TILE);
-  ctx.fillStyle = C.pipeRim;
-  ctx.fillRect(x - 3, y, TILE + 3, 6);
-  ctx.fillStyle = C.pipe2;
-  ctx.fillRect(x + TILE - 6, y, 6, TILE);
-  ctx.fillStyle = C.pipeDark;
-  ctx.fillRect(x + TILE - 2, y, 2, TILE);
-}
-
-function drawPipeTopR(x, y) {
-  ctx.fillStyle = C.pipe1;
-  ctx.fillRect(x, y, TILE + 3, TILE);
-  ctx.fillStyle = C.pipe2;
-  ctx.fillRect(x, y, 6, TILE);
-  ctx.fillStyle = C.pipeDark;
-  ctx.fillRect(x, y, 2, TILE);
-}
-
-function drawPipeBodyL(x, y) {
-  ctx.fillStyle = C.pipe1;
-  ctx.fillRect(x - 3, y, TILE + 3, TILE);
-  ctx.fillStyle = C.pipe2;
-  ctx.fillRect(x + TILE - 6, y, 6, TILE);
-  ctx.fillStyle = C.pipeDark;
-  ctx.fillRect(x + TILE - 2, y, 2, TILE);
-}
-
-function drawPipeBodyR(x, y) {
-  ctx.fillStyle = C.pipe1;
-  ctx.fillRect(x, y, TILE + 3, TILE);
-  ctx.fillStyle = C.pipe2;
-  ctx.fillRect(x, y, 6, TILE);
-  ctx.fillStyle = C.pipeDark;
-  ctx.fillRect(x, y, 2, TILE);
-}
-
-function drawSolidBlock(x, y) {
-  ctx.fillStyle = '#b04000';
-  ctx.fillRect(x, y, TILE, TILE);
-  ctx.fillStyle = '#c85000';
-  ctx.fillRect(x + 2, y + 2, TILE - 4, TILE - 4);
-}
-
-function drawCoinPickup(coin, screenX, y) {
-  if (coin.collected) return;
-  const pulse = Math.sin(Date.now() / 200) * 2;
-  // Coin body
-  ctx.fillStyle = C.coin;
-  ctx.beginPath();
-  ctx.ellipse(screenX + 8, y + 8, 7 + pulse * 0.3, 8, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = C.coinShine;
-  ctx.fillRect(screenX + 4, y + 3, 4, 5);
-}
-
-// ─────────────────────────────────────────────
-//  MARIO SPRITE (pixel art style shapes)
-// ─────────────────────────────────────────────
-function drawMario(screenX, screenY) {
-  if (mario.invincible > 0 && Math.floor(mario.invincible / 4) % 2 === 0) return;
-
-  const x = screenX;
-  const y = screenY;
-  const f = mario.facing;
-
-  ctx.save();
-  if (f === -1) {
-    ctx.translate(x + mario.w / 2, 0);
-    ctx.scale(-1, 1);
-    ctx.translate(-(x + mario.w / 2), 0);
-  }
-
-  // Hat (red)
-  ctx.fillStyle = C.mario;
-  ctx.fillRect(x + 4, y, 20, 6);
-  ctx.fillRect(x + 2, y + 6, 24, 4);
-
-  // Skin
-  ctx.fillStyle = C.marioPeach;
-  ctx.fillRect(x + 6, y + 10, 16, 10);
-
-  // Eyes
-  ctx.fillStyle = C.marioEyes;
-  ctx.fillRect(x + 16, y + 12, 4, 4);
-
-  // Mustache
-  ctx.fillStyle = C.marioBrown;
-  ctx.fillRect(x + 10, y + 18, 12, 3);
-
-  // Overalls (blue)
-  ctx.fillStyle = C.marioBlue;
-  ctx.fillRect(x + 4, y + 20, 20, 10);
-
-  // Buttons
-  ctx.fillStyle = C.marioPeach;
-  ctx.fillRect(x + 6, y + 22, 4, 3);
-  ctx.fillRect(x + 18, y + 22, 4, 3);
-
-  // Left arm
-  ctx.fillStyle = C.marioPeach;
-  ctx.fillRect(x, y + 20, 5, 8);
-  // Right arm
-  ctx.fillRect(x + 23, y + 20, 5, 8);
-
-  // Shoes (based on frame for walk animation)
-  const legOffset = mario.onGround ? (mario.frame === 1 ? -2 : mario.frame === 2 ? 2 : 0) : 0;
-  ctx.fillStyle = '#4a2000';
-  ctx.fillRect(x + 2,  y + 30 - legOffset, 10, 6);
-  ctx.fillRect(x + 16, y + 30 + legOffset, 10, 6);
-
-  ctx.restore();
-}
-
-// ─────────────────────────────────────────────
-//  CLOUDS
-// ─────────────────────────────────────────────
-const clouds = [
-  {x: 60,  y: 40, w: 100},
-  {x: 280, y: 60, w: 130},
-  {x: 500, y: 35, w: 90},
-  {x: 700, y: 55, w: 120},
-];
-let cloudTimer = 0;
-
-function drawCloud(x, y, w, screenX) {
-  const sx = x - screenX;
-  ctx.fillStyle = C.cloudShadow;
-  ctx.beginPath();
-  ctx.ellipse(sx + w * 0.3, y + 18, w * 0.28, 16, 0, 0, Math.PI * 2);
-  ctx.ellipse(sx + w * 0.6, y + 20, w * 0.32, 18, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = C.cloud;
-  ctx.beginPath();
-  ctx.ellipse(sx + w * 0.2, y + 14, w * 0.22, 14, 0, 0, Math.PI * 2);
-  ctx.ellipse(sx + w * 0.5, y + 10, w * 0.30, 16, 0, 0, Math.PI * 2);
-  ctx.ellipse(sx + w * 0.8, y + 14, w * 0.20, 13, 0, 0, Math.PI * 2);
-  ctx.fill();
-}
-
-// ─────────────────────────────────────────────
-//  RENDER
-// ─────────────────────────────────────────────
-function drawBG() {
-  // Sky gradient
-  const grad = ctx.createLinearGradient(0, 0, 0, H);
-  grad.addColorStop(0, C.sky2);
-  grad.addColorStop(1, C.sky1);
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, W, H);
-}
-
-function drawLevel() {
-  const startCol = Math.max(0, Math.floor(cameraX / TILE) - 1);
-  const endCol   = Math.min(MAP_COLS - 1, startCol + Math.ceil(W / TILE) + 2);
-
-  for (let row = 0; row < MAP_ROWS; row++) {
-    for (let col = startCol; col <= endCol; col++) {
-      const tid = levelMap[row][col];
-      if (tid === T.EMPTY) continue;
-      const wx = col * TILE - cameraX;
-      const wy = row * TILE;
-
-      switch (tid) {
-        case T.GROUND:      drawGround(wx, wy); break;
-        case T.BRICK:       drawBrick(wx, wy);  break;
-        case T.QUESTION:    drawQuestion(wx, wy, false); break;
-        case T.SOLID_BLOCK: drawQuestion(wx, wy, true);  break;
-        case T.PIPE_TOP_L:  drawPipeTopL(wx, wy);  break;
-        case T.PIPE_TOP_R:  drawPipeTopR(wx, wy);  break;
-        case T.PIPE_BODY_L: drawPipeBodyL(wx, wy); break;
-        case T.PIPE_BODY_R: drawPipeBodyR(wx, wy); break;
-      }
-    }
-  }
-}
-
-function drawParticles() {
-  particles.forEach(p => {
-    ctx.globalAlpha = p.life / p.maxLife;
-    ctx.fillStyle = p.color;
-    if (p.type === 'coin') {
-      ctx.beginPath();
-      ctx.arc(p.x - cameraX, p.y, p.w / 2, 0, Math.PI * 2);
-      ctx.fill();
-    } else {
-      ctx.fillRect(p.x - cameraX, p.y, p.w, p.h);
-    }
-    ctx.globalAlpha = 1;
-  });
-}
-
-function drawFloatingTexts() {
-  floatingTexts.forEach(f => {
-    ctx.globalAlpha = f.life / 60;
-    ctx.fillStyle   = f.color;
-    ctx.font        = 'bold 14px monospace';
-    ctx.textAlign   = 'center';
-    ctx.fillText(f.text, f.x - cameraX, f.y);
-    ctx.globalAlpha = 1;
-  });
-}
-
-function drawCoins() {
-  coinPickups.forEach(coin => {
-    const sx = coin.x - cameraX;
-    if (sx < -30 || sx > W + 30) return;
-    drawCoinPickup(coin, sx, coin.y);
-  });
-}
-
-function drawGameOver() {
-  if (!mario.dead || lives > 0) return;
-  ctx.fillStyle = 'rgba(0,0,0,0.55)';
-  ctx.fillRect(0, 0, W, H);
-  ctx.fillStyle = '#ffd700';
-  ctx.font = 'bold 48px monospace';
-  ctx.textAlign = 'center';
-  ctx.fillText('GAME OVER', W / 2, H / 2 - 20);
-  ctx.fillStyle = '#fff';
-  ctx.font = '22px monospace';
-  ctx.fillText(`Score: ${score}`, W / 2, H / 2 + 20);
-  ctx.fillStyle = '#aaa';
-  ctx.font = '16px monospace';
-  ctx.fillText('Press  R  to restart', W / 2, H / 2 + 55);
-}
-
-// ─────────────────────────────────────────────
-//  MAIN LOOP
-// ─────────────────────────────────────────────
-function gameLoop() {
-  update();
-
-  drawBG();
-
-  // Moving clouds (slow parallax)
-  cloudTimer += 0.3;
-  clouds.forEach((cl, i) => {
-    drawCloud(cl.x + cloudTimer * (0.3 + i * 0.1), cl.y, cl.w, cameraX * 0.4);
-  });
-
-  drawLevel();
-  drawCoins();
-  drawMario(mario.x - cameraX, mario.y);
-  drawParticles();
-  drawFloatingTexts();
-  drawGameOver();
-
-  requestAnimationFrame(gameLoop);
-}
-
-// ─────────────────────────────────────────────
-//  START
-// ─────────────────────────────────────────────
-resetMario();
-updateHUD();
-gameLoop();
-</script>
+  <!-- Core Scripts -->
+  <script src="synth.js"></script>
+  <script src="game.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

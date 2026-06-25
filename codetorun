@@ -1,1 +1,6 @@
-open /Users/ashokkumars/Desktop/mini_mario/index.html
+echo "--------------------------------------------------------"
+echo "Starting local Python HTTP server on port 8000..."
+echo "Open your web browser and navigate to:"
+echo "👉 http://localhost:8000"
+echo "--------------------------------------------------------"
+python3 -m http.server 8000
